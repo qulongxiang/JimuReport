@@ -8,6 +8,11 @@ spring:
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
 jeecg :
+  jmreport:
+    #是否开启租户模式 Support By v1.5.5+
+    openTenant: true
+    #是否启用签名校验,默认不开启，开启后会对执行sql的接口进行参数校验
+    safeMode: true
   # local|minio|alioss
   uploadType: local
   # local

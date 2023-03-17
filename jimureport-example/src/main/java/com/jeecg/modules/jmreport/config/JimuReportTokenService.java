@@ -1,10 +1,16 @@
 package com.jeecg.modules.jmreport.config;
 
+import lombok.val;
 import org.jeecg.modules.jmreport.api.JmReportTokenServiceI;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 自定义积木报表鉴权(如果不进行自定义，则所有请求不做权限控制)
@@ -14,6 +20,8 @@ import javax.servlet.http.HttpServletRequest;
 @Component
 public class JimuReportTokenService implements JmReportTokenServiceI {
 
+    @Autowired
+    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     /**
      * 通过请求获取Token
      * @param request
@@ -21,9 +29,10 @@ public class JimuReportTokenService implements JmReportTokenServiceI {
      */
     @Override
     public String getToken(HttpServletRequest request) {
-         //System.out.println("---------call---------getToken-----------------------");
-        //return TokenUtils.getTokenByRequest(request);
-        return "123456";
+        System.out.println("---------call---------getToken-----------------------");
+        String token= TokenUtils.getTokenByRequest(request);
+        System.out.println("getToken返回结果----token:"+token+"-----");
+        return token;
     }
 
     /**
@@ -33,8 +42,9 @@ public class JimuReportTokenService implements JmReportTokenServiceI {
      */
     @Override
     public String getUsername(String token) {
-        // return JwtUtil.getUsername(token);
-        return "admin";
+        String username = TokenUtils.getUsername(token);
+        System.out.println("getUsername 返回：  用户名："+username);
+        return username;
     }
 
     /**
@@ -45,8 +55,15 @@ public class JimuReportTokenService implements JmReportTokenServiceI {
     @Override
     public Boolean verifyToken(String token) {
         System.out.println("---------verify-----Token---------------");
-        //return TokenUtils.verifyToken(token, sysBaseAPI, redisUtil);
-        return true;
+        Boolean reBool=false; //认证结果
+        Map paramMap=new HashMap<>();
+        paramMap.put("token",token);
+        List list=namedParameterJdbcTemplate.queryForList("select jn.id from jimu_user_token jn where jn.token=:token ",paramMap);
+        if(list.size()>0){
+            reBool= TokenUtils.verifyToken(token);//认证通过 并且能解密
+        }
+        System.out.println("verifyToken认证返回结果："+reBool);
+        return reBool;
     }
 
     /**

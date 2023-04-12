@@ -75,7 +75,7 @@ public class TokenUtils {
     }
 
     public static void main(String[] args) {
-        generateToken("elink");
+        generateToken("neimeng");
         generateToken("scj");
         generateToken("ypj");
     }
